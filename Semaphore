@@ -1,0 +1,61 @@
+/*
+Semaphore 
+->It is a simple integer variable that helps to solve synchronization problem 
+->There are 2 types binary and counting Semaphore
+->They work like signalling mechanism 
+->wait() and notify() helps to indicate whether the thread is acquiring or releasing resources
+->Semaphore allows multiple program  threads to access finite instance of resources
+->The thread or process blocks itself if no resource is free till the count of Semaphore becomes greater than 0
+->Binry Semaphore is similar to mutex
+
+Mutex (Mutual Exclusion Objects)
+->They are locking mechanism
+->A thread need to acquire lock before entering into critical section and release it once done executing
+->Mutex allows multiple program threads to access single shared resource at a time 
+->If the lock is acquired by another thread or process then the other thread shall wait till it is unlocked
+*/
+
+
+enum Downloader{
+    INSTANCE;
+    
+    private Semaphore semaphore = new Semaphore(3, true);
+    public void downloadData(){
+        try{
+            semaphore.acquire();
+            download();
+        }
+        catch(InterruptedException e){
+            e.printStackTrace();
+        }
+        finally{
+            semaphore.release();
+        }
+    }
+    
+    
+    public void download(){
+        System.out.println("Download data from web");
+        try{
+            Thread.sleep(2000);
+        }
+    catch(InterruptedException e){
+            e.printStackTrace();
+        } 
+    }
+}
+
+
+
+public class Solution{
+    public static void main(String args[]){
+        ExecuterService executerService = Executors.newCachedThreadPool();
+        for(int i=0; i<12; i++){
+            executerService.execute(new Runnable(){
+              public void run(){
+                  Downloader.INSTANCE.downloadData();
+              }  
+            });
+        }
+    }
+}
